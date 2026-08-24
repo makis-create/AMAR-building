@@ -1,70 +1,498 @@
-<!-- ... existing code ... -->
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recorded By</th>
-                                <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
-                            </tr>
-                        </thead>
-<!-- ... existing code ... -->
-                            <div class="col-span-2 sm:col-span-1">
-                                <label class="block text-xs text-gray-500">Status</label>
-                                <select id="t-status" class="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amar Building - Commercial Property Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-w-full { width: 100% !important; max-width: 100% !important; }
+            body { background-color: white; }
+            .shadow-sm, .shadow-md { box-shadow: none !important; }
+            .border { border-color: #e5e7eb !important; }
+            .print-break-inside-avoid { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-gray-800 pb-12">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-brand-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <h1 class="text-xl font-bold text-gray-900">Amar Building <span class="text-sm font-normal text-gray-500 ml-2 hidden sm:inline">Property Manager</span></h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center text-sm font-medium text-gray-700">
+                        <span class="mr-2">Month:</span>
+                        <select id="month-selector" onchange="changeMonth()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm rounded-md shadow-sm bg-gray-50">
+                            <option value="2026-08">August 2026</option>
+                            <option value="2026-09">September 2026</option>
+                            <option value="2026-10">October 2026</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 no-print">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button onclick="switchTab('tenants')" id="tab-tenants" class="tab-btn border-brand-500 text-brand-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Tenants & Income
+                </button>
+                <button onclick="switchTab('staff')" id="tab-staff" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Staff & Salaries
+                </button>
+                <button onclick="switchTab('maintenance')" id="tab-maintenance" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Maintenance
+                </button>
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Dashboard & Report
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tenants Panel -->
+        <div id="panel-tenants" class="tab-panel mt-6 block">
+            <div class="sm:flex sm:items-center sm:justify-between mb-4 no-print">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">Tenant Rent & Utilities</h2>
+                <button onclick="openModal('tenantModal')" class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                    + Add Tenant Record
+                </button>
+            </div>
+            
+            <div class="flex flex-col">
+                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit & Tenant</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Rent</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilities (W/E)</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Due</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recorded By</th>
+                                        <th scope="col" class="relative px-6 py-3 no-print"><span class="sr-only">Actions</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tenant-list" class="bg-white divide-y divide-gray-200">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Panel -->
+        <div id="panel-staff" class="tab-panel mt-6 hidden">
+            <div class="sm:flex sm:items-center sm:justify-between mb-4 no-print">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">Staff Salaries</h2>
+                <button onclick="openModal('staffModal')" class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                    + Log Salary Payment
+                </button>
+            </div>
+            <div class="bg-white shadow overflow-hidden sm:rounded-md max-w-3xl">
+                <ul id="staff-list" class="divide-y divide-gray-200">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Maintenance Panel -->
+        <div id="panel-maintenance" class="tab-panel mt-6 hidden">
+            <div class="sm:flex sm:items-center sm:justify-between mb-4 no-print">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">Maintenance & Repairs Log</h2>
+                <button onclick="openModal('maintModal')" class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                    + Log Maintenance
+                </button>
+            </div>
+            <div class="bg-white shadow overflow-hidden sm:rounded-md max-w-4xl">
+                <ul id="maintenance-list" class="divide-y divide-gray-200">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Dashboard Panel -->
+        <div id="panel-dashboard" class="tab-panel mt-6 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl leading-6 font-bold text-gray-900">Monthly Board Report</h2>
+                    <p class="mt-1 text-sm text-gray-500">Amar Building performance summary for selected month.</p>
+                </div>
+                <div class="space-x-2 no-print flex">
+                    <button onclick="exportCSV()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none">
+                        <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export CSV
+                    </button>
+                    <button onclick="window.print()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                        <svg class="mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print / PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
+                <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-100">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">Collected Income (Paid)</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-green-600" id="dash-income">₱0.00</dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-100">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">Total Expenses</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-red-600" id="dash-expenses">₱0.00</dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-100">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">Net Operating Income</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-brand-600" id="dash-noi">₱0.00</dd>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outstanding Payments Notice -->
+            <div id="dash-outstanding-container" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 hidden print-break-inside-avoid">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800">Outstanding Payments</h3>
+                        <div class="mt-2 text-sm text-yellow-700">
+                            <ul id="dash-outstanding-list" class="list-disc pl-5 space-y-1">
+                                <!-- Populated by JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 print-break-inside-avoid">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-3 border-b pb-2">Expense Breakdown</h3>
+                    <ul id="dash-expense-list" class="divide-y divide-gray-200 bg-white shadow overflow-hidden sm:rounded-md px-4 py-2">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-3 border-b pb-2">Recent Maintenance</h3>
+                    <ul id="dash-maint-list" class="divide-y divide-gray-200 bg-white shadow overflow-hidden sm:rounded-md px-4 py-2">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenant Modal -->
+    <div id="tenantModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('tenantModal')"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Add/Edit Tenant Data</h3>
+                    <form id="tenantForm" onsubmit="event.preventDefault(); saveTenant();" class="mt-5 space-y-4">
+                        <input type="hidden" id="t-id">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Unit #</label>
+                                <input type="text" id="t-unit" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tenant / Business Name</label>
+                                <input type="text" id="t-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-4">
+                            <h4 class="text-sm font-medium text-gray-900 mb-3">Monthly Charges (₱)</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs text-gray-500">Base Rent</label>
+                                    <input type="number" step="0.01" id="t-rent" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">Water</label>
+                                    <input type="number" step="0.01" id="t-water" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500">Electric</label>
+                                    <input type="number" step="0.01" id="t-electric" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 border-t border-gray-200 pt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Payment Status</label>
+                                <select id="t-status" class="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                                     <option value="Paid">Paid in Full</option>
                                     <option value="Partial">Partial Payment</option>
                                     <option value="Pending">Pending Payment</option>
                                 </select>
                             </div>
-                            <div class="col-span-2 sm:col-span-1">
-                                <label class="block text-xs text-gray-500">Received/Recorded By</label>
-                                <input type="text" id="t-recordedBy" placeholder="e.g. Juan Cruz" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Received/Recorded By</label>
+                                <input type="text" id="t-recordedBy" placeholder="e.g. Juan Cruz" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                             </div>
                         </div>
-                    </div>
-<!-- ... existing code ... -->
+                        
+                        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                            <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-600 text-base font-medium text-white hover:bg-brand-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Save Record</button>
+                            <button type="button" onclick="closeModal('tenantModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Modal -->
+    <div id="staffModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('staffModal')"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Log Staff Salary</h3>
+                    <form id="staffForm" onsubmit="event.preventDefault(); saveStaff();" class="mt-5 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Role / Staff Type</label>
+                                <select id="s-role" class="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                                    <option value="Security Guard">Security Guard</option>
+                                    <option value="Cleaner">Cleaner</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Amount Paid (₱)</label>
+                                <input type="number" step="0.01" id="s-amount" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Date Paid</label>
-                                <input type="date" id="s-date" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <input type="date" id="s-date" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Delivered By</label>
-                                <input type="text" id="s-recordedBy" placeholder="e.g. Maria Santos" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <input type="text" id="s-recordedBy" placeholder="e.g. Maria Santos" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                             </div>
                         </div>
-                    </div>
-<!-- ... existing code ... -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Date Completed</label>
-                                    <input type="date" id="m-date" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                </div>
+                        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                            <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-600 text-base font-medium text-white hover:bg-brand-700 sm:ml-3 sm:w-auto sm:text-sm">Log Salary</button>
+                            <button type="button" onclick="closeModal('staffModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Modal -->
+    <div id="maintModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('maintModal')"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Log Maintenance/Repair</h3>
+                    <form id="maintForm" onsubmit="event.preventDefault(); saveMaintenance();" class="mt-5 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Description of Work</label>
+                            <input type="text" id="m-desc" placeholder="e.g. Fixed plumbing in Unit 102" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Total Cost (₱)</label>
+                                <input type="number" step="0.01" id="m-cost" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Logged/Approved By</label>
-                                <input type="text" id="m-recordedBy" placeholder="e.g. Admin" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <label class="block text-sm font-medium text-gray-700">Date Completed</label>
+                                <input type="date" id="m-date" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                             </div>
                         </div>
-                    </div>
-<!-- ... existing code ... -->
-        let appData = {
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Logged/Approved By</label>
+                            <input type="text" id="m-recordedBy" placeholder="e.g. Admin" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
+                        </div>
+                        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                            <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-600 text-base font-medium text-white hover:bg-brand-700 sm:ml-3 sm:w-auto sm:text-sm">Log Expense</button>
+                            <button type="button" onclick="closeModal('maintModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ----------------------------------------------------
+        // STATE AND LOCAL STORAGE CONFIGURATION
+        // ----------------------------------------------------
+        const STORAGE_KEY = 'amar_building_data';
+
+        const defaultData = {
             "2026-08": {
                 tenants: [
-                    { id: "t1", unit: "101", name: "Acme Corp", rent: 2500, water: 50, electric: 120, status: "Paid", recordedBy: "Admin" },
-                    { id: "t2", unit: "102", name: "Global Logistics", rent: 3000, water: 75, electric: 200, status: "Pending", recordedBy: "Admin" }
+                    { id: "t1", unit: "101", name: "Acme Corp", rent: 25000, water: 500, electric: 1200, status: "Paid", recordedBy: "Admin" },
+                    { id: "t2", unit: "102", name: "Global Logistics", rent: 30000, water: 750, electric: 2000, status: "Pending", recordedBy: "Admin" }
                 ],
                 staff: [
-                    { id: "s1", role: "security", amount: 1500, date: "2026-08-15", recordedBy: "Admin" },
-                    { id: "s2", role: "cleaner", amount: 800, date: "2026-08-15", recordedBy: "Admin" }
+                    { id: "s1", role: "Security Guard", amount: 15000, date: "2026-08-15", recordedBy: "Admin" },
+                    { id: "s2", role: "Cleaner", amount: 8000, date: "2026-08-15", recordedBy: "Admin" }
                 ],
                 maintenance: [
-                    { id: "m1", desc: "Replaced lobby lightbulbs", cost: 45.50, date: "2026-08-05", recordedBy: "Admin" },
-                    { id: "m2", desc: "Plumbing repair Unit 102", cost: 350.00, date: "2026-08-12", recordedBy: "Admin" }
+                    { id: "m1", desc: "Replaced lobby lightbulbs", cost: 450.50, date: "2026-08-05", recordedBy: "Admin" },
+                    { id: "m2", desc: "Plumbing repair Unit 102", cost: 3500.00, date: "2026-08-12", recordedBy: "Admin" }
                 ]
             },
             "2026-09": { tenants: [], staff: [], maintenance: [] },
-<!-- ... existing code ... -->
+            "2026-10": { tenants: [], staff: [], maintenance: [] }
+        };
+
+        // Load from LocalStorage or use defaults
+        let appData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!appData) {
+            appData = defaultData;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        let currentMonth = document.getElementById('month-selector').value;
+
+        // Save Function
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        // Initialize App on Load
+        window.onload = () => {
+            changeMonth();
+            switchTab('tenants');
+        };
+
+        // ----------------------------------------------------
+        // HELPER FUNCTIONS
+        // ----------------------------------------------------
+        function formatMoney(amount) {
+            return '₱' + parseFloat(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatDate(dateString) {
+            if(!dateString) return '';
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-PH', options);
+        }
+
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-brand-500', 'text-brand-600');
+                el.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            document.getElementById(`panel-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.remove('border-transparent', 'text-gray-500');
+            activeBtn.classList.add('border-brand-500', 'text-brand-600');
+        }
+
+        function changeMonth() {
+            currentMonth = document.getElementById('month-selector').value;
+            if (!appData[currentMonth]) {
+                appData[currentMonth] = { tenants: [], staff: [], maintenance: [] };
+                saveData();
+            }
+            renderAll();
+        }
+
+        function renderAll() {
+            renderTenants();
+            renderStaff();
+            renderMaintenance();
+            renderDashboard();
+        }
+
+        function openModal(modalId, data = null) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.getElementById(modalId.replace('Modal', 'Form')).reset();
+
+            if (modalId === 'tenantModal') {
+                document.getElementById('t-id').value = '';
+                document.getElementById('modal-title').innerText = "Add Tenant Data";
+                
+                if(data) {
+                    document.getElementById('t-id').value = data.id;
+                    document.getElementById('t-unit').value = data.unit;
+                    document.getElementById('t-name').value = data.name;
+                    document.getElementById('t-rent').value = data.rent;
+                    document.getElementById('t-water').value = data.water;
                     document.getElementById('t-electric').value = data.electric;
                     document.getElementById('t-status').value = data.status;
                     document.getElementById('t-recordedBy').value = data.recordedBy || '';
                     document.getElementById('modal-title').innerText = "Edit Tenant Data";
-<!-- ... existing code ... -->
+                }
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // ----------------------------------------------------
+        // TENANTS LOGIC
+        // ----------------------------------------------------
+        function saveTenant() {
+            const id = document.getElementById('t-id').value;
+            const tenantData = {
+                id: id || generateId(),
+                unit: document.getElementById('t-unit').value,
+                name: document.getElementById('t-name').value,
                 rent: parseFloat(document.getElementById('t-rent').value) || 0,
                 water: parseFloat(document.getElementById('t-water').value) || 0,
                 electric: parseFloat(document.getElementById('t-electric').value) || 0,
@@ -73,52 +501,286 @@
             };
 
             if(id) {
-<!-- ... existing code ... -->
+                const index = appData[currentMonth].tenants.findIndex(t => t.id === id);
+                if(index > -1) appData[currentMonth].tenants[index] = tenantData;
+            } else {
+                appData[currentMonth].tenants.push(tenantData);
+            }
+
+            saveData();
+            closeModal('tenantModal');
+            renderAll();
+        }
+
+        function deleteTenant(id) {
+            if(confirm('Remove this tenant record?')) {
+                appData[currentMonth].tenants = appData[currentMonth].tenants.filter(t => t.id !== id);
+                saveData();
+                renderAll();
+            }
+        }
+
+        function renderTenants() {
+            const tbody = document.getElementById('tenant-list');
+            tbody.innerHTML = '';
             const tenants = appData[currentMonth]?.tenants || [];
 
             if(tenants.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No tenant records found for this month.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No tenant records found for this month.</td></tr>`;
                 return;
             }
 
             tenants.forEach(t => {
-<!-- ... existing code ... -->
+                const utilities = t.water + t.electric;
+                const totalDue = t.rent + utilities;
+                
+                const statusBadge = t.status === 'Paid' 
+                    ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Paid</span>`
+                    : t.status === 'Partial'
+                    ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Partial</span>`
+                    : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">Unit ${t.unit}</div>
+                        <div class="text-sm text-gray-500">${t.name}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMoney(t.rent)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMoney(utilities)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${formatMoney(totalDue)}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.recordedBy || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onclick='openModal("tenantModal", ${JSON.stringify(t)})' class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-<!-- ... existing code ... -->
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium no-print">
+                        <button onclick='openModal("tenantModal", ${JSON.stringify(t)})' class="text-brand-600 hover:text-brand-900 mr-3">Edit</button>
+                        <button onclick='deleteTenant("${t.id}")' class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ----------------------------------------------------
+        // STAFF & SALARIES LOGIC
+        // ----------------------------------------------------
+        function saveStaff() {
+            const staffData = {
+                id: generateId(),
                 role: document.getElementById('s-role').value,
                 amount: parseFloat(document.getElementById('s-amount').value) || 0,
                 date: document.getElementById('s-date').value,
                 recordedBy: document.getElementById('s-recordedBy').value
             };
-
             appData[currentMonth].staff.push(staffData);
-<!-- ... existing code ... -->
-            const createRecordHTML = (s) => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-md border border-gray-100">
-                    <div>
-                        <div class="text-sm font-medium text-gray-900">${formatMoney(s.amount)}</div>
-                        <div class="text-xs text-gray-500">Paid: ${formatDate(s.date)} &bull; By: ${s.recordedBy || 'N/A'}</div>
+            saveData();
+            closeModal('staffModal');
+            renderAll();
+        }
+
+        function deleteStaff(id) {
+            if(confirm('Remove this staff payment?')) {
+                appData[currentMonth].staff = appData[currentMonth].staff.filter(s => s.id !== id);
+                saveData();
+                renderAll();
+            }
+        }
+
+        function renderStaff() {
+            const ul = document.getElementById('staff-list');
+            ul.innerHTML = '';
+            const staff = appData[currentMonth]?.staff || [];
+            
+            if(staff.length === 0) {
+                ul.innerHTML = `<li class="p-4 text-center text-sm text-gray-500">No salaries logged.</li>`;
+                return;
+            }
+
+            staff.forEach(s => {
+                const li = document.createElement('li');
+                li.className = "px-4 py-4 sm:px-6";
+                li.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <span class="inline-block h-10 w-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-gray-500">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-brand-600">${s.role}</p>
+                                <p class="text-sm text-gray-500">Paid: ${formatDate(s.date)} &bull; Delivered by: ${s.recordedBy || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm font-bold text-gray-900 mr-4">${formatMoney(s.amount)}</span>
+                            <button onclick='deleteStaff("${s.id}")' class="text-red-500 hover:text-red-700 text-sm font-medium no-print">Remove</button>
+                        </div>
                     </div>
-                    <button onclick='deleteStaff("${s.id}")' class="text-red-500 hover:text-red-700 p-1">
-<!-- ... existing code ... -->
+                `;
+                ul.appendChild(li);
+            });
+        }
+
+        // ----------------------------------------------------
+        // MAINTENANCE LOGIC
+        // ----------------------------------------------------
+        function saveMaintenance() {
+            const maintData = {
+                id: generateId(),
                 desc: document.getElementById('m-desc').value,
                 cost: parseFloat(document.getElementById('m-cost').value) || 0,
                 date: document.getElementById('m-date').value,
                 recordedBy: document.getElementById('m-recordedBy').value
             };
-
             appData[currentMonth].maintenance.push(maintData);
-<!-- ... existing code ... -->
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-900">${m.desc}</p>
-                            <p class="text-sm text-gray-500">Completed: ${formatDate(m.date)} &bull; Logged by: ${m.recordedBy || 'N/A'}</p>
+            saveData();
+            closeModal('maintModal');
+            renderAll();
+        }
+
+        function deleteMaintenance(id) {
+            if(confirm('Remove this maintenance log?')) {
+                appData[currentMonth].maintenance = appData[currentMonth].maintenance.filter(m => m.id !== id);
+                saveData();
+                renderAll();
+            }
+        }
+
+        function renderMaintenance() {
+            const ul = document.getElementById('maintenance-list');
+            ul.innerHTML = '';
+            const maint = appData[currentMonth]?.maintenance || [];
+
+            if(maint.length === 0) {
+                ul.innerHTML = `<li class="p-4 text-center text-sm text-gray-500">No maintenance logged.</li>`;
+                return;
+            }
+
+            maint.forEach(m => {
+                const li = document.createElement('li');
+                li.className = "px-4 py-4 sm:px-6";
+                li.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-orange-100 rounded-md p-2">
+                                <svg class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">${m.desc}</p>
+                                <p class="text-sm text-gray-500">Completed: ${formatDate(m.date)} &bull; Logged by: ${m.recordedBy || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm font-bold text-gray-900 mr-4">${formatMoney(m.cost)}</span>
+                            <button onclick='deleteMaintenance("${m.id}")' class="text-red-500 hover:text-red-700 text-sm font-medium no-print">Remove</button>
                         </div>
                     </div>
-<!-- ... existing code ... -->
+                `;
+                ul.appendChild(li);
+            });
+        }
+
+        // ----------------------------------------------------
+        // DASHBOARD LOGIC
+        // ----------------------------------------------------
+        function renderDashboard() {
+            const data = appData[currentMonth] || { tenants: [], staff: [], maintenance: [] };
+            
+            let totalIncome = 0;
+            let outstandingPayments = [];
+
+            data.tenants.forEach(t => {
+                const total = t.rent + t.water + t.electric;
+                if(t.status === 'Paid') {
+                    totalIncome += total;
+                } else {
+                    outstandingPayments.push(`Unit ${t.unit} (${t.name}) - ${formatMoney(total)} - Status: ${t.status}`);
+                }
+            });
+
+            let staffTotal = data.staff.reduce((sum, s) => sum + s.amount, 0);
+            let maintTotal = data.maintenance.reduce((sum, m) => sum + m.cost, 0);
+            let totalExpenses = staffTotal + maintTotal;
+            let noi = totalIncome - totalExpenses;
+
+            // Update KPI Cards
+            document.getElementById('dash-income').innerText = formatMoney(totalIncome);
+            document.getElementById('dash-expenses').innerText = formatMoney(totalExpenses);
+            document.getElementById('dash-noi').innerText = formatMoney(noi);
+            document.getElementById('dash-noi').className = noi >= 0 ? "mt-1 text-3xl font-semibold text-brand-600" : "mt-1 text-3xl font-semibold text-red-600";
+
+            // Outstanding Payments
+            const outContainer = document.getElementById('dash-outstanding-container');
+            const outList = document.getElementById('dash-outstanding-list');
+            outList.innerHTML = '';
+            
+            if(outstandingPayments.length > 0) {
+                outContainer.classList.remove('hidden');
+                outstandingPayments.forEach(msg => {
+                    const li = document.createElement('li');
+                    li.innerText = msg;
+                    outList.appendChild(li);
+                });
+            } else {
+                outContainer.classList.add('hidden');
+            }
+
+            // Breakdowns
+            const expList = document.getElementById('dash-expense-list');
+            expList.innerHTML = `
+                <li class="py-2 flex justify-between"><span class="text-sm text-gray-600">Staff Salaries</span> <span class="text-sm font-medium text-gray-900">${formatMoney(staffTotal)}</span></li>
+                <li class="py-2 flex justify-between"><span class="text-sm text-gray-600">Maintenance & Repairs</span> <span class="text-sm font-medium text-gray-900">${formatMoney(maintTotal)}</span></li>
+            `;
+
+            const dashMaintList = document.getElementById('dash-maint-list');
+            dashMaintList.innerHTML = '';
+            if(data.maintenance.length === 0) {
+                dashMaintList.innerHTML = `<li class="py-2 text-sm text-gray-500">No maintenance records this month.</li>`;
+            } else {
+                // Show last 3
+                data.maintenance.slice(-3).reverse().forEach(m => {
+                    dashMaintList.innerHTML += `<li class="py-2 flex justify-between"><span class="text-sm text-gray-600 truncate mr-2">${m.desc}</span> <span class="text-sm font-medium text-gray-900 whitespace-nowrap">${formatMoney(m.cost)}</span></li>`;
+                });
+            }
+        }
+
+        // ----------------------------------------------------
+        // EXPORT CSV LOGIC
+        // ----------------------------------------------------
+        function escapeCSV(str) {
+            if (str == null) return '""';
+            let stringValue = str.toString();
+            if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                stringValue = '"' + stringValue.replace(/"/g, '""') + '"';
+            }
+            return stringValue;
+        }
+
+        function exportCSV() {
+            const data = appData[currentMonth];
+            let csvRows = [];
+            
+            // Month Header
+            csvRows.push([`Amar Building - Monthly Report: ${currentMonth}`]);
+            csvRows.push([]);
+            
+            // 1. Summary Calculation
+            let totalIncome = 0;
+            data.tenants.forEach(t => { if(t.status === 'Paid') totalIncome += (t.rent + t.water + t.electric); });
+            let totalExpenses = data.staff.reduce((sum, s) => sum + s.amount, 0) + data.maintenance.reduce((sum, m) => sum + m.cost, 0);
+            let noi = totalIncome - totalExpenses;
+
+            csvRows.push(["Financial Summary", "Amount"]);
+            csvRows.push(["Collected Income (Paid)", `₱${totalIncome.toFixed(2)}`]);
+            csvRows.push(["Total Expenses", `₱${totalExpenses.toFixed(2)}`]);
+            csvRows.push(["Net Operating Income", `₱${noi.toFixed(2)}`]);
+            csvRows.push([]);
+
             // 2. Tenants Details
             csvRows.push(["Tenants Details"]);
             csvRows.push(["Unit", "Tenant Name", "Base Rent", "Water", "Electric", "Total Due", "Status", "Recorded By"]);
@@ -153,4 +815,17 @@
             });
 
             // Convert to CSV string and trigger download
-<!-- ... existing code ... -->
+            const csvString = csvRows.map(row => row.join(',')).join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `AmarBuilding_Report_${currentMonth}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
