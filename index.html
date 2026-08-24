@@ -27,7 +27,7 @@
             .no-print { display: none !important; }
             .print-w-full { width: 100% !important; max-width: 100% !important; }
             body { background-color: white; }
-            .shadow-sm, .shadow-md { box-shadow: none !important; }
+            .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; }
             .border { border-color: #e5e7eb !important; }
             .print-break-inside-avoid { break-inside: avoid; }
         }
@@ -51,6 +51,8 @@
                             <option value="2026-08">August 2026</option>
                             <option value="2026-09">September 2026</option>
                             <option value="2026-10">October 2026</option>
+                            <option value="2026-11">November 2026</option>
+                            <option value="2026-12">December 2026</option>
                         </select>
                     </div>
                 </div>
@@ -59,7 +61,6 @@
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <!-- Tab Navigation -->
         <div class="border-b border-gray-200 no-print">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button onclick="switchTab('tenants')" id="tab-tenants" class="tab-btn border-brand-500 text-brand-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
@@ -77,7 +78,6 @@
             </nav>
         </div>
 
-        <!-- Tenants Panel -->
         <div id="panel-tenants" class="tab-panel mt-6 block">
             <div class="sm:flex sm:items-center sm:justify-between mb-4 no-print">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Tenant Rent & Utilities</h2>
@@ -98,6 +98,7 @@
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilities (W/E)</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Due</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receipt</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recorded By</th>
                                         <th scope="col" class="relative px-6 py-3 no-print"><span class="sr-only">Actions</span></th>
                                     </tr>
@@ -112,7 +113,6 @@
             </div>
         </div>
 
-        <!-- Staff Panel -->
         <div id="panel-staff" class="tab-panel mt-6 hidden">
             <div class="sm:flex sm:items-center sm:justify-between mb-4 no-print">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Staff Salaries</h2>
@@ -127,7 +127,6 @@
             </div>
         </div>
 
-        <!-- Maintenance Panel -->
         <div id="panel-maintenance" class="tab-panel mt-6 hidden">
             <div class="sm:flex sm:items-center sm:justify-between mb-4 no-print">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Maintenance & Repairs Log</h2>
@@ -142,7 +141,6 @@
             </div>
         </div>
 
-        <!-- Dashboard Panel -->
         <div id="panel-dashboard" class="tab-panel mt-6 hidden">
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -165,7 +163,6 @@
                 </div>
             </div>
 
-            <!-- Dashboard Stats -->
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
                 <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-100">
                     <div class="px-4 py-5 sm:p-6">
@@ -187,7 +184,6 @@
                 </div>
             </div>
 
-            <!-- Outstanding Payments Notice -->
             <div id="dash-outstanding-container" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 hidden print-break-inside-avoid">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -196,7 +192,7 @@
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <h3 class="text-sm font-medium text-yellow-800">Outstanding Payments</h3>
+                        <h3 class="text-sm font-medium text-yellow-800">Outstanding / Partial Payments</h3>
                         <div class="mt-2 text-sm text-yellow-700">
                             <ul id="dash-outstanding-list" class="list-disc pl-5 space-y-1">
                                 <!-- Populated by JS -->
@@ -223,7 +219,6 @@
         </div>
     </div>
 
-    <!-- Tenant Modal -->
     <div id="tenantModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('tenantModal')"></div>
@@ -272,9 +267,18 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Received/Recorded By</label>
+                                <label class="block text-sm font-medium text-gray-700">Recorded By</label>
                                 <input type="text" id="t-recordedBy" placeholder="e.g. Juan Cruz" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                             </div>
+                        </div>
+
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <label class="block text-sm font-medium text-gray-700">Proof of Payment (Optional)</label>
+                            <div class="mt-1 flex items-center">
+                                <input type="file" id="t-receipt" accept="image/*" onchange="handleFileUpload(event)" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer w-full">
+                            </div>
+                            <p id="t-receipt-status" class="text-xs text-green-600 mt-2 font-medium"></p>
+                            <p class="text-xs text-gray-400 mt-1">Note: Images are automatically compressed to save storage space.</p>
                         </div>
                         
                         <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
@@ -287,7 +291,6 @@
         </div>
     </div>
 
-    <!-- Staff Modal -->
     <div id="staffModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('staffModal')"></div>
@@ -330,7 +333,6 @@
         </div>
     </div>
 
-    <!-- Maintenance Modal -->
     <div id="maintModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('maintModal')"></div>
@@ -357,6 +359,14 @@
                             <label class="block text-sm font-medium text-gray-700">Logged/Approved By</label>
                             <input type="text" id="m-recordedBy" placeholder="e.g. Admin" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                         </div>
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <label class="block text-sm font-medium text-gray-700">Invoice / Receipt (Optional)</label>
+                            <div class="mt-1 flex items-center">
+                                <input type="file" id="m-receipt" accept="image/*" onchange="handleFileUpload(event)" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer w-full">
+                            </div>
+                            <p id="m-receipt-status" class="text-xs text-green-600 mt-2 font-medium"></p>
+                        </div>
+
                         <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
                             <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-600 text-base font-medium text-white hover:bg-brand-700 sm:ml-3 sm:w-auto sm:text-sm">Log Expense</button>
                             <button type="button" onclick="closeModal('maintModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
@@ -367,32 +377,77 @@
         </div>
     </div>
 
-    <script>
-        // ----------------------------------------------------
-        // STATE AND LOCAL STORAGE CONFIGURATION
-        // ----------------------------------------------------
-        const STORAGE_KEY = 'amar_building_data';
+    <div id="imageViewerModal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity" aria-hidden="true" onclick="closeImageViewer()"></div>
+            <div class="relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-4xl w-full mx-4">
+                <div class="absolute top-0 right-0 pt-3 pr-3 flex justify-between w-full px-4 items-center bg-white border-b pb-2 mb-2">
+                    <h3 class="text-lg font-medium text-gray-900">Attached Document</h3>
+                    <button type="button" onclick="closeImageViewer()" class="text-gray-400 hover:text-gray-500 bg-white rounded-md focus:outline-none">
+                        <span class="sr-only">Close</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 mt-8 flex justify-center bg-gray-100 min-h-[50vh]">
+                    <img id="viewerImage" src="" alt="Receipt Document" class="w-auto h-auto max-h-[75vh] object-contain rounded-md shadow-sm border border-gray-200">
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div id="alertDialog" class="fixed z-50 inset-0 overflow-y-auto hidden">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeAlert()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+                <div class="mt-3 text-center sm:mt-5">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Notification</h3>
+                    <div class="mt-2"><p class="text-sm text-gray-500" id="alertMessage"></p></div>
+                </div>
+                <div class="mt-5 sm:mt-6">
+                    <button type="button" onclick="closeAlert()" class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-600 text-base font-medium text-white hover:bg-brand-700 sm:text-sm">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmDialog" class="fixed z-50 inset-0 overflow-y-auto hidden">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeConfirmDialog()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Confirm Deletion</h3>
+                        <div class="mt-2"><p class="text-sm text-gray-500" id="confirmMessage"></p></div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="executeConfirmation()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Delete</button>
+                    <button type="button" onclick="closeConfirmDialog()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'amar_building_data';
+        let currentBase64Image = null; // Buffer for compressing images
+        let pendingConfirmAction = null; // Buffer for custom confirmation box
+
+        // Default skeleton data
         const defaultData = {
-            "2026-08": {
-                tenants: [
-                    { id: "t1", unit: "101", name: "Acme Corp", rent: 25000, water: 500, electric: 1200, status: "Paid", recordedBy: "Admin" },
-                    { id: "t2", unit: "102", name: "Global Logistics", rent: 30000, water: 750, electric: 2000, status: "Pending", recordedBy: "Admin" }
-                ],
-                staff: [
-                    { id: "s1", role: "Security Guard", amount: 15000, date: "2026-08-15", recordedBy: "Admin" },
-                    { id: "s2", role: "Cleaner", amount: 8000, date: "2026-08-15", recordedBy: "Admin" }
-                ],
-                maintenance: [
-                    { id: "m1", desc: "Replaced lobby lightbulbs", cost: 450.50, date: "2026-08-05", recordedBy: "Admin" },
-                    { id: "m2", desc: "Plumbing repair Unit 102", cost: 3500.00, date: "2026-08-12", recordedBy: "Admin" }
-                ]
-            },
+            "2026-08": { tenants: [], staff: [], maintenance: [] },
             "2026-09": { tenants: [], staff: [], maintenance: [] },
             "2026-10": { tenants: [], staff: [], maintenance: [] }
         };
 
-        // Load from LocalStorage or use defaults
+        // Load from LocalStorage
         let appData = JSON.parse(localStorage.getItem(STORAGE_KEY));
         if (!appData) {
             appData = defaultData;
@@ -401,20 +456,46 @@
 
         let currentMonth = document.getElementById('month-selector').value;
 
-        // Save Function
         function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            } catch (e) {
+                // If local storage hits the 5MB limit due to images
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    showAlert("Warning: Storage limit exceeded! Image attachments take up significant space in your browser. You may need to delete older records to save new ones.");
+                } else {
+                    showAlert("An error occurred while saving: " + e.message);
+                }
+            }
         }
 
-        // Initialize App on Load
         window.onload = () => {
             changeMonth();
             switchTab('tenants');
         };
 
-        // ----------------------------------------------------
-        // HELPER FUNCTIONS
-        // ----------------------------------------------------
+        function showAlert(message) {
+            document.getElementById('alertMessage').innerText = message;
+            document.getElementById('alertDialog').classList.remove('hidden');
+        }
+        function closeAlert() {
+            document.getElementById('alertDialog').classList.add('hidden');
+        }
+
+        function requireConfirmation(message, actionCallback) {
+            document.getElementById('confirmMessage').innerText = message;
+            pendingConfirmAction = actionCallback;
+            document.getElementById('confirmDialog').classList.remove('hidden');
+        }
+        function executeConfirmation() {
+            if(pendingConfirmAction) pendingConfirmAction();
+            closeConfirmDialog();
+        }
+        function closeConfirmDialog() {
+            document.getElementById('confirmDialog').classList.add('hidden');
+            pendingConfirmAction = null;
+        }
+
         function formatMoney(amount) {
             return '₱' + parseFloat(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
@@ -435,7 +516,6 @@
                 el.classList.remove('border-brand-500', 'text-brand-600');
                 el.classList.add('border-transparent', 'text-gray-500');
             });
-
             document.getElementById(`panel-${tabName}`).classList.remove('hidden');
             const activeBtn = document.getElementById(`tab-${tabName}`);
             activeBtn.classList.remove('border-transparent', 'text-gray-500');
@@ -458,13 +538,81 @@
             renderDashboard();
         }
 
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Update status text so user knows it's working
+            const statusEl = event.target.id === 't-receipt' ? document.getElementById('t-receipt-status') : document.getElementById('m-receipt-status');
+            statusEl.innerText = "Compressing image...";
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Shrink to max 800px width/height
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Compress to JPEG at 60% quality (drastically reduces file size for LocalStorage)
+                    currentBase64Image = canvas.toDataURL('image/jpeg', 0.6); 
+                    statusEl.innerText = "✅ Image compressed and ready to save.";
+                }
+            }
+        }
+
+        function viewReceipt(type, id) {
+            let base64Str = null;
+            if (type === 'tenant') {
+                const record = appData[currentMonth].tenants.find(t => t.id === id);
+                if (record) base64Str = record.receipt;
+            } else if (type === 'maint') {
+                const record = appData[currentMonth].maintenance.find(m => m.id === id);
+                if (record) base64Str = record.receipt;
+            }
+
+            if(base64Str) {
+                document.getElementById('viewerImage').src = base64Str;
+                document.getElementById('imageViewerModal').classList.remove('hidden');
+            } else {
+                showAlert("No receipt found for this record.");
+            }
+        }
+
+        function closeImageViewer() {
+            document.getElementById('imageViewerModal').classList.add('hidden');
+            document.getElementById('viewerImage').src = ''; // Clear to free memory
+        }
+
         function openModal(modalId, data = null) {
             document.getElementById(modalId).classList.remove('hidden');
             document.getElementById(modalId.replace('Modal', 'Form')).reset();
+            currentBase64Image = null; // Clear any pending image upload
 
             if (modalId === 'tenantModal') {
                 document.getElementById('t-id').value = '';
                 document.getElementById('modal-title').innerText = "Add Tenant Data";
+                document.getElementById('t-receipt-status').innerText = "";
                 
                 if(data) {
                     document.getElementById('t-id').value = data.id;
@@ -475,8 +623,15 @@
                     document.getElementById('t-electric').value = data.electric;
                     document.getElementById('t-status').value = data.status;
                     document.getElementById('t-recordedBy').value = data.recordedBy || '';
+                    
+                    // Retain existing image if they don't upload a new one
+                    currentBase64Image = data.receipt || null;
+                    if(data.receipt) document.getElementById('t-receipt-status').innerText = "✅ Existing receipt attached. Uploading a new one will replace it.";
+                    
                     document.getElementById('modal-title').innerText = "Edit Tenant Data";
                 }
+            } else if (modalId === 'maintModal') {
+                document.getElementById('m-receipt-status').innerText = "";
             }
         }
 
@@ -484,9 +639,6 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        // ----------------------------------------------------
-        // TENANTS LOGIC
-        // ----------------------------------------------------
         function saveTenant() {
             const id = document.getElementById('t-id').value;
             const tenantData = {
@@ -497,7 +649,8 @@
                 water: parseFloat(document.getElementById('t-water').value) || 0,
                 electric: parseFloat(document.getElementById('t-electric').value) || 0,
                 status: document.getElementById('t-status').value,
-                recordedBy: document.getElementById('t-recordedBy').value
+                recordedBy: document.getElementById('t-recordedBy').value,
+                receipt: currentBase64Image // Attach compressed image
             };
 
             if(id) {
@@ -513,11 +666,11 @@
         }
 
         function deleteTenant(id) {
-            if(confirm('Remove this tenant record?')) {
+            requireConfirmation('Are you sure you want to completely remove this tenant record?', () => {
                 appData[currentMonth].tenants = appData[currentMonth].tenants.filter(t => t.id !== id);
                 saveData();
                 renderAll();
-            }
+            });
         }
 
         function renderTenants() {
@@ -526,7 +679,7 @@
             const tenants = appData[currentMonth]?.tenants || [];
 
             if(tenants.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No tenant records found for this month.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No tenant records found for this month.</td></tr>`;
                 return;
             }
 
@@ -540,6 +693,12 @@
                     ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Partial</span>`
                     : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>`;
 
+                const receiptBadge = t.receipt 
+                    ? `<button onclick="viewReceipt('tenant', '${t.id}')" class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-brand-700 bg-brand-50 hover:bg-brand-100 focus:outline-none">
+                        <svg class="mr-1 h-3 w-3 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg> View
+                       </button>` 
+                    : `<span class="text-xs text-gray-400">-</span>`;
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -550,9 +709,10 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMoney(utilities)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${formatMoney(totalDue)}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${receiptBadge}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.recordedBy || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium no-print">
-                        <button onclick='openModal("tenantModal", ${JSON.stringify(t)})' class="text-brand-600 hover:text-brand-900 mr-3">Edit</button>
+                        <button onclick='openModal("tenantModal", ${JSON.stringify(t).replace(/'/g, "&#39;")})' class="text-brand-600 hover:text-brand-900 mr-3">Edit</button>
                         <button onclick='deleteTenant("${t.id}")' class="text-red-600 hover:text-red-900">Delete</button>
                     </td>
                 `;
@@ -560,9 +720,6 @@
             });
         }
 
-        // ----------------------------------------------------
-        // STAFF & SALARIES LOGIC
-        // ----------------------------------------------------
         function saveStaff() {
             const staffData = {
                 id: generateId(),
@@ -578,11 +735,11 @@
         }
 
         function deleteStaff(id) {
-            if(confirm('Remove this staff payment?')) {
+            requireConfirmation('Remove this staff payment record?', () => {
                 appData[currentMonth].staff = appData[currentMonth].staff.filter(s => s.id !== id);
                 saveData();
                 renderAll();
-            }
+            });
         }
 
         function renderStaff() {
@@ -591,7 +748,7 @@
             const staff = appData[currentMonth]?.staff || [];
             
             if(staff.length === 0) {
-                ul.innerHTML = `<li class="p-4 text-center text-sm text-gray-500">No salaries logged.</li>`;
+                ul.innerHTML = `<li class="p-4 text-center text-sm text-gray-500">No salaries logged for this month.</li>`;
                 return;
             }
 
@@ -623,16 +780,14 @@
             });
         }
 
-        // ----------------------------------------------------
-        // MAINTENANCE LOGIC
-        // ----------------------------------------------------
         function saveMaintenance() {
             const maintData = {
                 id: generateId(),
                 desc: document.getElementById('m-desc').value,
                 cost: parseFloat(document.getElementById('m-cost').value) || 0,
                 date: document.getElementById('m-date').value,
-                recordedBy: document.getElementById('m-recordedBy').value
+                recordedBy: document.getElementById('m-recordedBy').value,
+                receipt: currentBase64Image
             };
             appData[currentMonth].maintenance.push(maintData);
             saveData();
@@ -641,11 +796,11 @@
         }
 
         function deleteMaintenance(id) {
-            if(confirm('Remove this maintenance log?')) {
+            requireConfirmation('Remove this maintenance log completely?', () => {
                 appData[currentMonth].maintenance = appData[currentMonth].maintenance.filter(m => m.id !== id);
                 saveData();
                 renderAll();
-            }
+            });
         }
 
         function renderMaintenance() {
@@ -654,13 +809,18 @@
             const maint = appData[currentMonth]?.maintenance || [];
 
             if(maint.length === 0) {
-                ul.innerHTML = `<li class="p-4 text-center text-sm text-gray-500">No maintenance logged.</li>`;
+                ul.innerHTML = `<li class="p-4 text-center text-sm text-gray-500">No maintenance logged this month.</li>`;
                 return;
             }
 
             maint.forEach(m => {
                 const li = document.createElement('li');
                 li.className = "px-4 py-4 sm:px-6";
+                
+                const receiptLink = m.receipt 
+                    ? `<button onclick="viewReceipt('maint', '${m.id}')" class="text-brand-600 hover:text-brand-800 underline ml-2">View Invoice</button>` 
+                    : '';
+
                 li.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -672,7 +832,7 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-gray-900">${m.desc}</p>
-                                <p class="text-sm text-gray-500">Completed: ${formatDate(m.date)} &bull; Logged by: ${m.recordedBy || 'N/A'}</p>
+                                <p class="text-sm text-gray-500">Completed: ${formatDate(m.date)} &bull; Logged by: ${m.recordedBy || 'N/A'} ${receiptLink}</p>
                             </div>
                         </div>
                         <div class="flex items-center">
@@ -685,9 +845,6 @@
             });
         }
 
-        // ----------------------------------------------------
-        // DASHBOARD LOGIC
-        // ----------------------------------------------------
         function renderDashboard() {
             const data = appData[currentMonth] || { tenants: [], staff: [], maintenance: [] };
             
@@ -698,8 +855,12 @@
                 const total = t.rent + t.water + t.electric;
                 if(t.status === 'Paid') {
                     totalIncome += total;
+                } else if (t.status === 'Partial') {
+                    // Assuming partial payment means half was paid for summary purposes
+                    totalIncome += (total / 2);
+                    outstandingPayments.push(`Unit ${t.unit} (${t.name}) - ${formatMoney(total)} - Status: Partial`);
                 } else {
-                    outstandingPayments.push(`Unit ${t.unit} (${t.name}) - ${formatMoney(total)} - Status: ${t.status}`);
+                    outstandingPayments.push(`Unit ${t.unit} (${t.name}) - ${formatMoney(total)} - Status: Pending`);
                 }
             });
 
@@ -714,7 +875,7 @@
             document.getElementById('dash-noi').innerText = formatMoney(noi);
             document.getElementById('dash-noi').className = noi >= 0 ? "mt-1 text-3xl font-semibold text-brand-600" : "mt-1 text-3xl font-semibold text-red-600";
 
-            // Outstanding Payments
+            // Outstanding Payments Array mapping
             const outContainer = document.getElementById('dash-outstanding-container');
             const outList = document.getElementById('dash-outstanding-list');
             outList.innerHTML = '';
@@ -730,28 +891,25 @@
                 outContainer.classList.add('hidden');
             }
 
-            // Breakdowns
+            // Simple Expense Breakdown
             const expList = document.getElementById('dash-expense-list');
             expList.innerHTML = `
                 <li class="py-2 flex justify-between"><span class="text-sm text-gray-600">Staff Salaries</span> <span class="text-sm font-medium text-gray-900">${formatMoney(staffTotal)}</span></li>
                 <li class="py-2 flex justify-between"><span class="text-sm text-gray-600">Maintenance & Repairs</span> <span class="text-sm font-medium text-gray-900">${formatMoney(maintTotal)}</span></li>
             `;
 
+            // Recent maintenance snippets
             const dashMaintList = document.getElementById('dash-maint-list');
             dashMaintList.innerHTML = '';
             if(data.maintenance.length === 0) {
                 dashMaintList.innerHTML = `<li class="py-2 text-sm text-gray-500">No maintenance records this month.</li>`;
             } else {
-                // Show last 3
                 data.maintenance.slice(-3).reverse().forEach(m => {
                     dashMaintList.innerHTML += `<li class="py-2 flex justify-between"><span class="text-sm text-gray-600 truncate mr-2">${m.desc}</span> <span class="text-sm font-medium text-gray-900 whitespace-nowrap">${formatMoney(m.cost)}</span></li>`;
                 });
             }
         }
 
-        // ----------------------------------------------------
-        // EXPORT CSV LOGIC
-        // ----------------------------------------------------
         function escapeCSV(str) {
             if (str == null) return '""';
             let stringValue = str.toString();
@@ -765,25 +923,26 @@
             const data = appData[currentMonth];
             let csvRows = [];
             
-            // Month Header
             csvRows.push([`Amar Building - Monthly Report: ${currentMonth}`]);
             csvRows.push([]);
             
-            // 1. Summary Calculation
             let totalIncome = 0;
-            data.tenants.forEach(t => { if(t.status === 'Paid') totalIncome += (t.rent + t.water + t.electric); });
+            data.tenants.forEach(t => { 
+                const total = t.rent + t.water + t.electric;
+                if(t.status === 'Paid') totalIncome += total; 
+                if(t.status === 'Partial') totalIncome += (total / 2);
+            });
             let totalExpenses = data.staff.reduce((sum, s) => sum + s.amount, 0) + data.maintenance.reduce((sum, m) => sum + m.cost, 0);
             let noi = totalIncome - totalExpenses;
 
             csvRows.push(["Financial Summary", "Amount"]);
-            csvRows.push(["Collected Income (Paid)", `₱${totalIncome.toFixed(2)}`]);
+            csvRows.push(["Collected Income (includes Partial estimates)", `₱${totalIncome.toFixed(2)}`]);
             csvRows.push(["Total Expenses", `₱${totalExpenses.toFixed(2)}`]);
             csvRows.push(["Net Operating Income", `₱${noi.toFixed(2)}`]);
             csvRows.push([]);
 
-            // 2. Tenants Details
             csvRows.push(["Tenants Details"]);
-            csvRows.push(["Unit", "Tenant Name", "Base Rent", "Water", "Electric", "Total Due", "Status", "Recorded By"]);
+            csvRows.push(["Unit", "Tenant Name", "Base Rent", "Water", "Electric", "Total Due", "Status", "Recorded By", "Receipt Attached?"]);
             data.tenants.forEach(t => {
                 const total = t.rent + t.water + t.electric;
                 csvRows.push([
@@ -794,12 +953,12 @@
                     `₱${t.electric.toFixed(2)}`, 
                     `₱${total.toFixed(2)}`, 
                     t.status,
-                    escapeCSV(t.recordedBy || 'N/A')
+                    escapeCSV(t.recordedBy || 'N/A'),
+                    t.receipt ? "Yes" : "No"
                 ]);
             });
             csvRows.push([]);
 
-            // 3. Staff Details
             csvRows.push(["Staff Payments"]);
             csvRows.push(["Role", "Date", "Amount", "Delivered By"]);
             data.staff.forEach(s => {
@@ -807,14 +966,12 @@
             });
             csvRows.push([]);
 
-            // 4. Maintenance Details
             csvRows.push(["Maintenance Log"]);
-            csvRows.push(["Description", "Date", "Cost", "Logged By"]);
+            csvRows.push(["Description", "Date", "Cost", "Logged By", "Invoice Attached?"]);
             data.maintenance.forEach(m => {
-                csvRows.push([escapeCSV(m.desc), m.date, `₱${m.cost.toFixed(2)}`, escapeCSV(m.recordedBy || 'N/A')]);
+                csvRows.push([escapeCSV(m.desc), m.date, `₱${m.cost.toFixed(2)}`, escapeCSV(m.recordedBy || 'N/A'), m.receipt ? "Yes" : "No"]);
             });
 
-            // Convert to CSV string and trigger download
             const csvString = csvRows.map(row => row.join(',')).join('\n');
             const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
