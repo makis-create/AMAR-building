@@ -396,21 +396,10 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let userId = null;
-
+    <script>
         // State Management 
         let currentMonth = "2026-08"; 
+        const STORAGE_KEY = "amar_building_data";
         
         let appData = {
             "2026-08": {
@@ -431,54 +420,29 @@
             "2026-10": { tenants: [], staff: [], maintenance: [] }
         };
 
-        async function saveMonthData(month) {
-            if (!userId) return;
-            // Saves data securely linked to your unique property manager session
-            const monthRef = doc(db, 'artifacts', appId, 'users', userId, 'months', month);
-            try {
-                await setDoc(monthRef, appData[month]);
-            } catch (err) {
-                console.error("Save error:", err);
-            }
+        function saveMonthData(month) {
+            // Saves all data to local browser storage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
         }
 
-        async function initStorage() {
-            try {
-                // Authenticate before allowing data access
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                    userId = userCredential.user.uid;
-                } else {
-                    const userCredential = await signInAnonymously(auth);
-                    userId = userCredential.user.uid;
-                }
-                
-                const monthsRef = collection(db, 'artifacts', appId, 'users', userId, 'months');
-                let isFirstLoad = true;
-                
-                // Listen for real-time changes
-                onSnapshot(monthsRef, (snapshot) => {
-                    if (snapshot.empty && isFirstLoad) {
-                        // Seed initial dummy data to DB if starting fresh
-                        Object.keys(appData).forEach(month => saveMonthData(month));
-                    } else {
-                        snapshot.forEach(doc => {
-                            appData[doc.id] = doc.data();
-                        });
-                    }
-                    isFirstLoad = false;
-                    
-                    if(!appData[currentMonth]) {
-                        appData[currentMonth] = { tenants: [], staff: [], maintenance: [] };
-                    }
-                    refreshAllViews();
-                }, (error) => {
-                    console.error("Snapshot error:", error);
-                });
-                
-            } catch (error) {
-                console.error("Auth error:", error);
+        function initStorage() {
+            // Check if there is saved data in the browser
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            
+            if (savedData) {
+                // Load existing data
+                appData = JSON.parse(savedData);
+            } else {
+                // If this is the very first time, save the default template data
+                saveMonthData(currentMonth);
             }
+            
+            // Ensure the current month exists in our data object
+            if(!appData[currentMonth]) {
+                appData[currentMonth] = { tenants: [], staff: [], maintenance: [] };
+            }
+            
+            refreshAllViews();
         }
 
         const formatMoney = (amount) => {
@@ -509,7 +473,7 @@
             document.getElementById('m-date').value = today;
 
             switchTab('tenants'); 
-            initStorage(); // Trigger database connection
+            initStorage(); // Trigger local storage connection
         });
 
         window.switchTab = function(tabId) {
@@ -589,13 +553,14 @@
                 appData[currentMonth].tenants.push(tenantData);
             }
 
-            saveMonthData(currentMonth); // Push change to cloud
+            saveMonthData(currentMonth); // Push change to local storage
             closeAllModals();
         }
 
         window.deleteTenant = function(id) {
             appData[currentMonth].tenants = appData[currentMonth].tenants.filter(t => t.id !== id);
-            saveMonthData(currentMonth); // Push change to cloud
+            saveMonthData(currentMonth); 
+            refreshAllViews();
         }
 
         function renderTenants() {
@@ -646,11 +611,13 @@
             appData[currentMonth].staff.push(staffData);
             saveMonthData(currentMonth);
             closeAllModals();
+            refreshAllViews();
         }
         
         window.deleteStaff = function(id) {
             appData[currentMonth].staff = appData[currentMonth].staff.filter(s => s.id !== id);
             saveMonthData(currentMonth);
+            refreshAllViews();
         }
 
         function renderStaff() {
@@ -702,11 +669,13 @@
             appData[currentMonth].maintenance.push(maintData);
             saveMonthData(currentMonth);
             closeAllModals();
+            refreshAllViews();
         }
 
         window.deleteMaint = function(id) {
             appData[currentMonth].maintenance = appData[currentMonth].maintenance.filter(m => m.id !== id);
             saveMonthData(currentMonth);
+            refreshAllViews();
         }
 
         function renderMaintenance() {
