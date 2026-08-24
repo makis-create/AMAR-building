@@ -1,4 +1,5 @@
 Amar Building - Property Management Site
+< !DOCTYPE html >
 <html lang="en">
 <head>
     <meta charset="UTF-8">
